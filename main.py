@@ -10,6 +10,13 @@ def timenow(): return time.strftime("%X", time.localtime())
 
 weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
 
+# маленькое "я жив" админам от бота
+from admins import getadmins
+def alert_admins(something):
+    for admin in getadmins(): bot.send_message(admin, something, parse_mode='MARKDOWN')
+alert_admins("`   рил толк`\n` я снова жив`\n  __но это не точно__ ")
+
+
 def rand_quote(message):
     rand = (random.randint(0,len(config.quote)))
     # if  (0 < rand <= 37):
