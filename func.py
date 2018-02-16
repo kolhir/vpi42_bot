@@ -20,6 +20,10 @@ def listGroup():
 def group_name(group):
     h = db.Group.get(db.Group.id == group)
     return(h.name)
+def str_group(group):
+    for i in range(10):
+        print('std_group')
+    return(group_name(group))
 
 def addUser(*args):
     group = db.Group.get(db.Group.name == args[1])
