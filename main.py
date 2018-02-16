@@ -11,10 +11,9 @@ def timenow(): return time.strftime("%X", time.localtime())
 weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
 
 def rand_quote(message):
-    quotes=config.quote
-    rand = (random.randint(0,len(quotes)))
+    rand = (random.randint(0,len(config.quote)))
     # if  (0 < rand <= 37):
-    quote = quotes[rand]
+    quote = config.quote[rand]
     user = message.from_user
     k=user
     group = f.id2group(user.id)
@@ -23,12 +22,12 @@ def rand_quote(message):
     if group:
         group = f.str_group(group)
         print("Группа: ", group, " ", timenow(), sep = "")
-    print(k.id, ";  Имя: ", user.first_name, ";  Фамилия: ", user.last_name, "; User_name: ", user.username, "\n", "Отправлена цитата:", quote , "\n", sep = "")
+    print(user.id, ";  Имя: ", user.first_name, ";  Фамилия: ", user.last_name, "; User_name: ", user.username, "\n", "Отправлена цитата:", quote , "\n", sep = "")
     bot.send_message(message.from_user.id, quote , reply_markup = start_murkup())
 
 def send_message(userid, string, message, reply_markup=None, parse=None):
     k = message.from_user
-    l = f.inowyou(k.id)
+    l = f.id2group(k.id)
     print("Вывод")
     if(l):
         l = f.str_group(l)
@@ -47,7 +46,7 @@ def std_keyb():
 
 
 def choose_group(message):
-    user_group_id = f.iknowyou(message.from_user.id)
+    user_group_id = f.id2group(message.from_user.id)
     if user_group_id:
         f.deleteUser(message.from_user.id)
     l = f.listGroup()
@@ -75,7 +74,7 @@ def ttOnDay(message):
 #     my_send_message(message.from_user.id, "Что изменить?", user_markup, message)
 
 def nextLesson(message):
-    answer = f.nextLesson(f.inowyou(message.from_user.id))
+    answer = f.nextLesson(f.id2group(message.from_user.id))
 
     if answer == "":
         rand_quote(message)
@@ -103,21 +102,21 @@ def handle_db(message):
 
 @bot.message_handler(commands=['start'])
 def handle_start(message):
-    user_group_id = f.inowyou(message.from_user.id)
+    user_group_id = f.id2group(message.from_user.id)
     if user_group_id:
         k = message.from_user
-        l = f.str_group(f.inowyou(k.id))
+        l = f.str_group(f.id2group(k.id))
         send_message(message.from_user.id, 'я тебя вроде уже знаю, ты из '+str(l),message ,reply_markup =  start_murkup())
     else:
         choose_group(message)
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    user_group_id = f.inowyou(message.from_user.id)
+    user_group_id = f.id2group(message.from_user.id)
     k = message.from_user
     print("Ввод")
     if(user_group_id):
-        l = f.str_group(f.inowyou(k.id))
+        l = f.str_group(f.id2group(k.id))
         print("Группа: ",l, " ", timenow(), sep = "")
     print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Сообщение от пользователя: ", message.text, "\n", sep = "")
 
@@ -143,13 +142,13 @@ def handle_text(message):
 def onDay(message):
     print("Ввод")
     k = message.from_user
-    user_group_id = f.inowyou(k.id)
+    user_group_id = f.id2group(k.id)
     if(user_group_id):
         l = f.str_group(user_group_id)
         print("Группа: ",l, " ", timenow(), sep = "")
     print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Сообщение от пользователя: ", message.text, "\n", sep = "")
     if message.text in weekdays:
-        answer = f.onDay(message.text, f.inowyou(message.from_user.id))
+        answer = f.onDay(message.text, f.id2group(message.from_user.id))
         if answer == "":
             rand_quote(message)
         else:

@@ -45,7 +45,7 @@ def time_dict():
 def nextLesson(group):
     timeles = time_dict()
 
-    #timenow = time.strptime(time.strftime("%X", time.localtime()), "%X")
+    timenow = time.strptime(time.strftime("%X", time.localtime()), "%X")
     # timenow = time.strptime("13:45:00", "%X")
     weekday_number = date.weekday(datetime.now()) + 1
     weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
@@ -80,18 +80,18 @@ def nextLesson(group):
     def answer_next_l(i):
         answer = ""
         lesson = tt.select().where(tt.group_id == group , tt.day_id == weekday_number, tt.number_week_id == week, tt.lesson_time_id == i)
-        for l in lesson:
+        l =lesson[0]
 
-            lesson_next = db.Lessons.get(id = l.lesson_id)
-            teacher_next =  db.Teacher.get(id = l.teacher_id)
-            room_next =  db.Room.get(id = l.room_id)
-            type_next = db.TypeLesson.get(id = l.type_lessons_id)
+        lesson_next = db.Lessons.get(id = l.lesson_id)
+        teacher_next =  db.Teacher.get(id = l.teacher_id)
+        room_next =  db.Room.get(id = l.room_id)
+        type_next = db.TypeLesson.get(id = l.type_lessons_id)
 
-            answer = (lesson_next.full_name+"\n"+ type_next.type_name +"\n"\
-            +room_next.korpus+" "+str(room_next.number)+"\n"\
-            +teacher_next.last_name)
+        answer = (lesson_next.full_name+"\n"+ type_next.type_name +"\n"\
+        +room_next.korpus+" "+str(room_next.number)+"\n"\
+        +teacher_next.last_name)
 
-            return answer        #TODO WHAT
+        return answer        #TODO на нах
     for i in range(1,n):
         les1s = time.strptime(timeles[w][start][str(i)], "%X")
         les1e = time.strptime(timeles[w][end][str(i)], "%X")
