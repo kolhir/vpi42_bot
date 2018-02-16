@@ -1,10 +1,9 @@
 import telebot, config, time, random, requests
 import func as f
 from datetime import datetime,date
-from somewhere import token, i_am_alive
+from somewhere import token
 
 bot = telebot.TeleBot(token, threaded=False)
-i_am_alive(bot)
 
 def timenow(): return time.strftime("%X", time.localtime())
 
@@ -49,10 +48,10 @@ def choose_group(message):
     user_group_id = f.id2group(message.from_user.id)
     if user_group_id:
         f.deleteUser(message.from_user.id)
-    l = f.listGroup()
+    allGroups = f.listGroup()
     print(l)
     user_markup = telebot.types.ReplyKeyboardMarkup(True, False)
-    for i in l:
+    for i in all:
         user_markup.row(i)
     send_message(message.from_user.id, "Выбери группу", message ,reply_markup = user_markup)
 
