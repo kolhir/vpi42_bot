@@ -4,7 +4,7 @@ from datetime import datetime,date
 start = "начало"
 end = "конец"
 weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
-def inowyou(user_id):
+def id2group(user_id):
     group = ""
     if len(db.Users.select().where(db.Users.user_id == user_id)) == 0:
         return 0
@@ -17,7 +17,7 @@ def listGroup():
     for i in db.Group.select():
         l.append(i.name)
     return l
-def str_group(group):
+def group_name(group):
     h = db.Group.get(db.Group.id == group)
     return(h.name)
 
@@ -45,11 +45,10 @@ def time_dict():
 def nextLesson(group):
     timeles = time_dict()
 
-    timenow = time.strptime(time.strftime("%X", time.localtime()), "%X")
+    #timenow = time.strptime(time.strftime("%X", time.localtime()), "%X")
     # timenow = time.strptime("13:45:00", "%X")
-    weekday_number = date.weekday(datetime.now())
+    weekday_number = date.weekday(datetime.now()) + 1
     weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
-
     day = weekdays[weekday_number]
 
     week=(int(datetime.today().strftime("%U")))%2+1
@@ -57,14 +56,14 @@ def nextLesson(group):
 
     flag = ""
     tt = db.Time_table
-    if weekday_number == 6:
+    if weekday_number == 7:
         answer = ""
         return answer
-    elif weekday_number == 5:
+    elif weekday_number == 6: #TODO проверить субботу
         answer = ""
         return answer
     else: w = 0
-    dayX = weekday_number + 1
+    dayX = weekday_number
     # if not(tt[klass][day]):
     #     answer = "Так хочется учиться сегодня??? Сорри, кажется у тебя сегодня выходной."
     #     return answer
@@ -75,12 +74,12 @@ def nextLesson(group):
     #         break
     # n = n - 1
 
-    p = tt.select().where(tt.group_id == group , tt.day_id == dayX, tt.number_week_id == week)
+    p = tt.select().where(tt.group_id == group , tt.day_id == weekday_number, tt.number_week_id == week)
     n = len(p)
 
     def answer_next_l(i):
         answer = ""
-        lesson = tt.select().where(tt.group_id == group , tt.day_id == dayX, tt.number_week_id == week, tt.lesson_time_id == i)
+        lesson = tt.select().where(tt.group_id == group , tt.day_id == weekday_number, tt.number_week_id == week, tt.lesson_time_id == i)
         for l in lesson:
 
             lesson_next = db.Lessons.get(id = l.lesson_id)
@@ -92,30 +91,30 @@ def nextLesson(group):
             +room_next.korpus+" "+str(room_next.number)+"\n"\
             +teacher_next.last_name)
 
-            return answer
+            return answer        #TODO WHAT
     for i in range(1,n):
-        start1b = time.strptime(timeles[w][start][str(i)], "%X")
-        start1e = time.strptime(timeles[w][end][str(i)], "%X")
-        start2b = time.strptime(timeles[w][start][str(i + 1)], "%X")
-        start2e = time.strptime(timeles[w][end][str(i + 1)], "%X")
+        les1s = time.strptime(timeles[w][start][str(i)], "%X")
+        les1e = time.strptime(timeles[w][end][str(i)], "%X")
+        les2s = time.strptime(timeles[w][start][str(i + 1)], "%X")
+        les2e = time.strptime(timeles[w][end][str(i + 1)], "%X")
 
-        if start1b <= timenow <=  start1e:
+        if les1s <= timenow <=  les1e: #TODO timenow неопределенно
             answer = answer_next_l(i+1)
             flag = answer_next_l(i+1)
             break
-        elif start1e <= timenow <= start2b:
+        elif les1e <= timenow <= les2s:
             answer = answer_next_l(i+1)
             flag = answer_next_l(i+1)
             break
-        elif (i == n-1) and (start2b <= timenow <= start2e):
+        elif (i == n-1) and (les2s <= timenow <= les2e):
             answer = (str(answer_next_l(i+1)) + str("(последняя пара)"))
             flag  = answer_next_l(i+1)
             break
-        elif (i == n-1) and (timenow > start2e):
+        elif (i == n-1) and (timenow > les2e):
             answer = ("Все, остановись, сегодня больше нет пар")
             flag = ""
             break
-        elif (i==1) and (timenow < start1b):
+        elif (i==1) and (timenow < les1s):
             lesson = tt.select().where(tt.group_id == group , tt.day_id == dayX, tt.number_week_id == week)
             l = lesson[0]
             lesson_next = db.Lessons.get(id = l.lesson_id)

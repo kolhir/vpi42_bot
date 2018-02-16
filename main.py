@@ -1,30 +1,29 @@
 import telebot, config, time, random, requests
 import func as f
 from datetime import datetime,date
-token = config.token
+from somewhere import token, i_am_alive
+
 bot = telebot.TeleBot(token, threaded=False)
-# bot = telebot.TeleBot(token)
-weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
+i_am_alive(bot)
 
 def timenow(): return time.strftime("%X", time.localtime())
 
-# маленькое "я жив" админам от бота
-from somewhere import getadmins
-def alert_admins(something):
-    for admin in getadmins(): bot.send_message(admin, something, parse_mode='MARKDOWN')
-alert_admins("`   рил толк`\n` я снова жив`\n  __но это не точно__ ")
+weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
 
 def rand_quote(message):
-    rand = (random.randint(0,37))
+    quotes=config.quote
+    rand = (random.randint(0,len(quotes)))
     # if  (0 < rand <= 37):
-    quote = config.quote[rand]
-    k = message.from_user
-    l = f.inowyou(k.id)
+    quote = quotes[rand]
+    user = message.from_user
+    k=user
+    group = f.id2group(user.id)
+    l=group
     print("Вывод")
-    if l:
-        l = f.str_group(l)
-        print("Группа: ", l, " ", timenow(), sep = "")
-    print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Отправлена цитата:", quote , "\n", sep = "")
+    if group:
+        group = f.str_group(group)
+        print("Группа: ", group, " ", timenow(), sep = "")
+    print(k.id, ";  Имя: ", user.first_name, ";  Фамилия: ", user.last_name, "; User_name: ", user.username, "\n", "Отправлена цитата:", quote , "\n", sep = "")
     bot.send_message(message.from_user.id, quote , reply_markup = start_murkup())
 
 def send_message(userid, string, message, reply_markup=None, parse=None):
@@ -38,7 +37,7 @@ def send_message(userid, string, message, reply_markup=None, parse=None):
     return (bot.send_message(userid, string, reply_markup = reply_markup, parse_mode = parse))
 
 
-def start_murkup():
+def std_keyb():
     user_markup = telebot.types.ReplyKeyboardMarkup(True, False)
     user_markup.row('Следующая пара','Номер недели')
     user_markup.row('Расписание на день')
@@ -48,7 +47,7 @@ def start_murkup():
 
 
 def choose_group(message):
-    user_group_id = f.inowyou(message.from_user.id)
+    user_group_id = f.iknowyou(message.from_user.id)
     if user_group_id:
         f.deleteUser(message.from_user.id)
     l = f.listGroup()
