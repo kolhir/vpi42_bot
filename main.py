@@ -1,10 +1,9 @@
 import telebot, config, time, random, requests
 import func as f
 from datetime import datetime,date
-from somewhere import token, i_am_alive
+from somewhere import token
 
 bot = telebot.TeleBot(token, threaded=False)
-i_am_alive(bot)
 
 def timenow(): return time.strftime("%X", time.localtime())
 
