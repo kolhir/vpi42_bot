@@ -2,7 +2,7 @@
 from telebot import types
 token = '447521432:AAH3vaAYbuzcqw8OtSmqu1nCYcQQceRBDS4' #test4
 admins=('148964502','65353297')
-alive_message="...em lliK "
+alive_message="...em lliK lol kek cheboureck "
 def getadmins():
 	return(admins)
 
