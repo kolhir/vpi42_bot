@@ -9,7 +9,7 @@ weekdays=("Понедельник","Вторник","Среда","Четверг
 def timenow(): return time.strftime("%X", time.localtime())
 
 # маленькое "я жив" админам от бота
-from somewhere import getadmins
+from admins import getadmins
 def alert_admins(something):
     for admin in getadmins(): bot.send_message(admin, something, parse_mode='MARKDOWN')
 alert_admins("`   рил толк`\n` я снова жив`\n  __но это не точно__ ")

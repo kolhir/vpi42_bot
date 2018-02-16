@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 from telebot import types
-token = 'your token here'
-admins=('admin','another admin')
+from somewhere import admins
 alive_message="kill me please "
 def getadmins():
 	return(admins)
