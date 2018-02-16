@@ -28,7 +28,7 @@ def rand_quote(message):
         group = f.str_group(group)
         print("Группа: ", group, " ", timenow(), sep = "")
     print(user.id, ";  Имя: ", user.first_name, ";  Фамилия: ", user.last_name, "; User_name: ", user.username, "\n", "Отправлена цитата:", quote , "\n", sep = "")
-    bot.send_message(message.from_user.id, quote , reply_markup = std_keyb())
+    bot.send_message(message.from_user.id, quote , reply_markup = standart_buttons_markup())
 
 def send_message(userid, string, message, reply_markup=None, parse=None):
     k = message.from_user
@@ -41,7 +41,7 @@ def send_message(userid, string, message, reply_markup=None, parse=None):
     return (bot.send_message(userid, string, reply_markup = reply_markup, parse_mode = parse))
 
 
-def std_keyb():
+def standart_buttons_markup():
     user_markup = telebot.types.ReplyKeyboardMarkup(True, False)
     user_markup.row('Следующая пара','Номер недели')
     user_markup.row('Расписание на день')
@@ -62,7 +62,7 @@ def choose_group(message):
     send_message(message.from_user.id, "Выбери группу", message ,reply_markup = user_markup)
 
 def start(message):
-    send_message(message.from_user.id, "Выбери действие", message,  reply_markup = std_keyb())
+    send_message(message.from_user.id, "Выбери действие", message,  reply_markup = standart_buttons_markup())
 
 def ttOnDay(message):
     user_markup = telebot.types.ReplyKeyboardMarkup(True, False)
@@ -84,7 +84,7 @@ def nextLesson(message):
     if answer == "":
         rand_quote(message)
     else:
-        send_message(message.from_user.id, answer,message, reply_markup =  std_keyb())
+        send_message(message.from_user.id, answer,message, reply_markup =  standart_buttons_markup())
         if answer in config.not_lesson:
             rand_quote(message)
 
@@ -93,7 +93,7 @@ def untilTheEnd(message):
     if answer == "":
         rand_quote(message)
     else:
-        send_message(message.from_user.id, answer,message ,reply_markup =   std_keyb())###Передать класс человека
+        send_message(message.from_user.id, answer,message ,reply_markup =   standart_buttons_markup())###Передать класс человека
         if answer in config.not_lesson:
             rand_quote(message)
 def number_week(message):
@@ -111,7 +111,7 @@ def handle_start(message):
     if user_group_id:
         k = message.from_user
         l = f.str_group(f.id2group(k.id))
-        send_message(message.from_user.id, 'я тебя вроде уже знаю, ты из '+str(l),message ,reply_markup =  std_keyb())
+        send_message(message.from_user.id, 'я тебя вроде уже знаю, ты из '+str(l),message ,reply_markup =  standart_buttons_markup())
     else:
         choose_group(message)
 
@@ -157,7 +157,7 @@ def onDay(message):
         if answer == "":
             rand_quote(message)
         else:
-            send_message(message.from_user.id, answer,message , reply_markup = std_keyb(),parse='MARKDOWN')
+            send_message(message.from_user.id, answer,message , reply_markup = standart_buttons_markup(),parse='MARKDOWN')
             if answer in config.not_lesson:
                 rand_quote(message)
     elif message.text == "Следующий урок":
