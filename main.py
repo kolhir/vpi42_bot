@@ -9,6 +9,7 @@ def timenow(): return time.strftime("%X", time.localtime())
 
 weekdays=("Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье")
 
+
 from admins import getadmins
 def alert_admins(something):
     for admin in getadmins(): bot.send_message(admin, something, parse_mode='MARKDOWN')
@@ -17,7 +18,6 @@ alert_admins("`   рил толк`\n` я снова жив`\n  __но это н�
 
 def rand_quote(message):
     rand = (random.randint(0,len(config.quote)))
-    # if  (0 < rand <= 37):
     quote = config.quote[rand]
     user = message.from_user
     k=user
@@ -64,11 +64,12 @@ def choose_group(message):
 def start(message):
     send_message(message.from_user.id, "Выбери действие", message,  reply_markup = standart_buttons_markup())
 
-def ttOnDay(message):
+def ttOnDay(message,week=(int(datetime.today().strftime("%U")))%2+1):
     user_markup = telebot.types.ReplyKeyboardMarkup(True, False)
-    user_markup.row('Понедельник', 'Четверг')
-    user_markup.row('Вторник', 'Пятница')
-    user_markup.row('Среда', 'Суббота')
+    user_markup.row('Понедельник'+'('+'I'*week+')', 'Четверг'+'('+'I'*week+')')
+    user_markup.row('Вторник'+'('+'I'*week+')', 'Пятница'+'('+'I'*week+')')
+    user_markup.row('Среда'+'('+'I'*week+')', 'Суббота'+'('+'I'*week+')')
+    user_markup.row('Сменить неделю'+' ('+'I'*((week)%2+1)+')')
     day = send_message(message.from_user.id, "Выбери день",message , reply_markup = user_markup)
     bot.register_next_step_handler(day, onDay)
 
@@ -144,7 +145,7 @@ def handle_text(message):
     else:
         choose_group(message)
 
-def onDay(message):
+def onDay(message): #рассписание
     print("Ввод")
     k = message.from_user
     user_group_id = f.id2group(k.id)
@@ -152,16 +153,27 @@ def onDay(message):
         l = f.str_group(user_group_id)
         print("Группа: ",l, " ", timenow(), sep = "")
     print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Сообщение от пользователя: ", message.text, "\n", sep = "")
-    if message.text in weekdays:
-        answer = f.onDay(message.text, f.id2group(message.from_user.id))
+    #конец логов начало логики
+    msgtxt=message.text
+    if msgtxt[:msgtxt.find('(')] in weekdays or msgtxt.find('(')==-1 and msgtxt in weekdays : # ввели ли день недели с учетом возможного  "(..." на конце(нет проверки того что в скобках)
+        week=(msgtxt[msgtxt.find('(')+1:-1])
+        weekNum=-1
+        for I in week:
+            if I=='I': weekNum=weekNum+1
+            else: weekNum=42
+        if weekNum in range(0,2):
+            answer = f.onDay(msgtxt[:msgtxt.find('(')], f.id2group(message.from_user.id),week=weekNum+1)
+        else: ttOnDay(message)
         if answer == "":
             rand_quote(message)
         else:
             send_message(message.from_user.id, answer,message , reply_markup = standart_buttons_markup(),parse='MARKDOWN')
             if answer in config.not_lesson:
                 rand_quote(message)
-    elif message.text == "Следующий урок":
-         nextLesson(message)
+    #elif message.text == "Следующий урок": #это тут не нужно
+    #     nextLesson(message)
+    elif msgtxt[:msgtxt.find('(')] =='Сменить неделю ':
+        ttOnDay(message,week=((int(datetime.today().strftime("%U")))%2+1)%2+1)
     else: ttOnDay(message)
 while True:
     try:

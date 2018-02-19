@@ -147,12 +147,12 @@ def nextLesson(group):
         answer = "Сегодня больше нет пар"
         return answer
 
-def onDay(day, group):
+def onDay(day, group,week=42):
     answer = ""
-    flag = 0
-    win = ""
-    weekday_number = 42
-    for i,k in enumerate(weekdays):
+    flag = 0             #еб
+    win = ""                #вашуж
+    weekday_number = 42         #мать
+    for i,k in enumerate(weekdays):  #блять
         if day == k:
             weekday_number = i + 1
 
@@ -166,7 +166,8 @@ def onDay(day, group):
 
     tt = db.Time_table
     dayX = weekday_number
-    week=(int(datetime.today().strftime("%U")))%2+1
+    if week==42:
+        week=(int(datetime.today().strftime("%U")))%2+1
 
     p = tt.select().where(tt.group_id == group , tt.day_id == dayX, tt.number_week_id == week)
     n = len(p)
