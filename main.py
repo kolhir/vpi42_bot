@@ -28,7 +28,7 @@ def rand_quote(message):
     l=group
     print("Вывод")
     if group:
-        group = f.str_group(group)
+        group = f.group_name(group)
         print("Группа: ", group, " ", timenow(), sep = "")
     print(user.id, ";  Имя: ", user.first_name, ";  Фамилия: ", user.last_name, "; User_name: ", user.username, "\n", "Отправлена цитата:", quote , "\n", sep = "")
     bot.send_message(message.from_user.id, quote , reply_markup = standart_buttons_markup())
@@ -38,7 +38,7 @@ def send_message(userid, string, message, reply_markup=None, parse=None):
     l = f.id2group(k.id)
     print("Вывод")
     if(l):
-        l = f.str_group(l)
+        l = f.group_name(l)
         print("Группа: ", str(l), " ", timenow(), sep = "")
     print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Сообщение: ", string, "\n", sep = "")
     return (bot.send_message(userid, string, reply_markup = reply_markup, parse_mode = parse))
@@ -73,12 +73,13 @@ def choose_group(message):
 def start(message):
     send_message(message.from_user.id, "Выбери действие", message,  reply_markup = standart_buttons_markup())
 
-def ttOnDay(message,week=(int(datetime.today().strftime("%U")))%2+1):
+def ttOnDay(message,week=(int(datetime.today().strftime("%U"))%2+1)):
+    print(week)
     user_markup = telebot.types.ReplyKeyboardMarkup(True, False)
     user_markup.row('Понедельник'+'('+'I'*week+')', 'Четверг'+'('+'I'*week+')')
     user_markup.row('Вторник'+'('+'I'*week+')', 'Пятница'+'('+'I'*week+')')
     user_markup.row('Среда'+'('+'I'*week+')', 'Суббота'+'('+'I'*week+')')
-    user_markup.row('Сменить неделю'+' ('+'I'*((week)%2+1)+')')
+    user_markup.row('Сменить неделю'+' ('+'I'*((3-week))+')')
     day = send_message(message.from_user.id, "Выбери день",message , reply_markup = user_markup)
     bot.register_next_step_handler(day, onDay)
 
@@ -107,7 +108,9 @@ def untilTheEnd(message):
         if answer in config.not_lesson:
             rand_quote(message)
 def number_week(message):
-    week=(int(datetime.today().strftime("%U")))%2+1
+
+    week=(3-int(datetime.today().strftime("%U"))%2)
+    print(week)
     KRASIVIY_VIVOD_id_Vasya = ('Сейчас идет ' + ['первая','вторая'][week-1] + ' учебная неделя')
     send_message(message.from_user.id,KRASIVIY_VIVOD_id_Vasya,message)
     rand_quote(message)
@@ -118,31 +121,31 @@ def callback_inline(call):
     if call.message:
         msgtxt=call.data[1:]
         vektor=call.data[0]
-        if vektor=='':'⤵'
-        else:
-            k = call.message.chat
-            week=(msgtxt[msgtxt.find('(')+1:-1])
-            weekNum=-1
-            for I in week:
-                if I=='I': weekNum=weekNum+1
-                else: weekNum=42
-            if weekNum in range(0,2):
-                daynum=weekdays.index(msgtxt[:msgtxt.find('(')])
-                if vektor=='⬅':
-                    daynum=daynum-1
-                    if daynum==-1:
-                        daynum=5
-                        weekNum=1-weekNum
-                elif vektor=='➡':
-                    daynum=daynum+1
-                    if daynum==6:
-                        daynum=0
-                        weekNum=1-weekNum
-                answer = f.onDay(weekdays[daynum], f.id2group(call.message.from_user.id),week=weekNum+1)
-                #print((weekdays[daynum], f.id2group(call.message.chat.id),weekNum+1))
+        k = call.message.chat
+        week=(msgtxt[msgtxt.find('(')+1:-1])
+        print(week)
+        weekNum=-1
+        for I in week:
+            if I=='I': weekNum=weekNum+1
+            else: weekNum=42
+        if weekNum in range(0,2):
+            daynum=weekdays.index(msgtxt[:msgtxt.find('(')])
+            if vektor=='⬅':
+                daynum=daynum-1
+                if daynum==-1:
+                    daynum=5
+                    weekNum=2-weekNum
+            elif vektor=='➡':
+                daynum=daynum+1
+                if daynum==5:
+                    daynum=0
+                    weekNum=2-weekNum
+            answer = f.onDay(weekdays[daynum], f.id2group(call.message.from_user.id),week=weekNum+1)
+            print(weekNum+1)
+            #print((weekdays[daynum], f.id2group(call.message.chat.id),weekNum+1))
 
 
-                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=answer,reply_markup=getinlineOnDay(weekdays[daynum]+'('+'I'*(weekNum+1)+')'))
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=answer,reply_markup=getinlineOnDay(weekdays[daynum]+'('+'I'*(weekNum+1)+')'))
 
 @bot.message_handler(commands=['db'])
 def handle_db(message):
@@ -153,7 +156,7 @@ def handle_start(message):
     user_group_id = f.id2group(message.from_user.id)
     if user_group_id:
         k = message.from_user
-        l = f.str_group(f.id2group(k.id))
+        l = f.group_name(f.id2group(k.id))
         send_message(message.from_user.id, 'я тебя вроде уже знаю, ты из '+str(l),message ,reply_markup =  standart_buttons_markup())
     else:
         choose_group(message)
@@ -164,7 +167,7 @@ def handle_text(message):
     k = message.from_user
     print("Ввод")
     if(user_group_id):
-        l = f.str_group(f.id2group(k.id))
+        l = f.group_name(f.id2group(k.id))
         print("Группа: ",l, " ", timenow(), sep = "")
     print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Сообщение от пользователя: ", message.text, "\n", sep = "")
 
@@ -199,6 +202,7 @@ def onDay(message): #рассписание
     msgtxt=message.text
     if msgtxt[:msgtxt.find('(')] in weekdays or msgtxt.find('(')==-1 and msgtxt in weekdays : # ввели ли день недели с учетом возможного  "(..." на конце(нет проверки того что в скобках)
         week=(msgtxt[msgtxt.find('(')+1:-1])
+        print(week)
         weekNum=-1
         for I in week:
             if I=='I': weekNum=weekNum+1
@@ -216,7 +220,8 @@ def onDay(message): #рассписание
     #elif message.text == "Следующий урок": #это тут не нужно
     #     nextLesson(message)
     elif msgtxt[:msgtxt.find('(')] =='Сменить неделю ':
-        ttOnDay(message,week=((int(datetime.today().strftime("%U")))%2+1)%2+1)
+        week=(msgtxt[msgtxt.find('(')+1:-1])
+        ttOnDay(message,week=len(week))
     else: ttOnDay(message)
 while True:
     try:

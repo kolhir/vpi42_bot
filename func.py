@@ -156,7 +156,7 @@ def onDay(day, group,week=42):
         if day == k:
             weekday_number = i + 1
 
-    if  1 < weekday_number <= 5:
+    if  1 < weekday_number <= 6:
         w = 0
     else: return ""
     timeles = time_dict()
@@ -198,6 +198,7 @@ def onDay(day, group,week=42):
            answer = answer + win + ('`'+str(i) + ". " + st[0:5] + " - " +en[0:5]+ "` " + str(answer_l(i)) + " \n")
            win = ""
         if ((i == 6) and (flag == 6)):
+            print(answer)
             answer = ("Вы не учитесь в этот день")
             break
     return answer
