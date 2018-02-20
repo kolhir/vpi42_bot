@@ -140,8 +140,8 @@ def callback_inline(call):
                 if daynum==5:
                     daynum=0
                     weekNum=2-weekNum
-            answer = f.onDay(weekdays[daynum], f.id2group(call.message.from_user.id),week=weekNum+1)
-            print(weekNum+1)
+            answer = f.onDay(weekdays[daynum], f.id2group(call.from_user.id),week=weekNum+1)
+            
             #print((weekdays[daynum], f.id2group(call.message.chat.id),weekNum+1))
 
 
@@ -200,6 +200,7 @@ def onDay(message): #рассписание
     print(k.id, ";  Имя: ", k.first_name, ";  Фамилия: ", k.last_name, "; User_name: ", k.username, "\n", "Сообщение от пользователя: ", message.text, "\n", sep = "")
     #конец логов начало логики
     msgtxt=message.text
+    print(msgtxt)
     if msgtxt[:msgtxt.find('(')] in weekdays or msgtxt.find('(')==-1 and msgtxt in weekdays : # ввели ли день недели с учетом возможного  "(..." на конце(нет проверки того что в скобках)
         week=(msgtxt[msgtxt.find('(')+1:-1])
         print(week)
