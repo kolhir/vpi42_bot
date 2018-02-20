@@ -2,6 +2,7 @@ import telebot, config, time, random, requests
 import func as f
 from datetime import datetime,date
 from somewhere import token
+from telebot import types
 
 bot = telebot.TeleBot(token, threaded=False)
 
@@ -12,7 +13,9 @@ weekdays=("Понедельник","Вторник","Среда","Четверг
 
 from admins import getadmins
 def alert_admins(something):
-    for admin in getadmins(): bot.send_message(admin, something, parse_mode='MARKDOWN')
+    for admin in getadmins():
+        print(admin)
+        bot.send_message(admin, something, parse_mode='MARKDOWN')
 alert_admins("`   рил толк`\n` я снова жив`\n  __но это не точно__ ")
 
 
@@ -49,6 +52,12 @@ def standart_buttons_markup():
     user_markup.row('Изменить группу')
     return user_markup
 
+def getinlineOnDay(msgtxt):
+    inlineOnDay = types.InlineKeyboardMarkup()
+    inlineOnDay.add(types.InlineKeyboardButton(text="⬅", callback_data="⬅"+msgtxt))
+    #inlineOnDay.add(types.InlineKeyboardButton(text="⤵", callback_data="⤵"+msgtxt))
+    inlineOnDay.add(types.InlineKeyboardButton(text="➡", callback_data="➡"+msgtxt))
+    return(inlineOnDay)
 
 def choose_group(message):
     user_group_id = f.id2group(message.from_user.id)
@@ -102,6 +111,39 @@ def number_week(message):
     KRASIVIY_VIVOD_id_Vasya = ('Сейчас идет ' + ['первая','вторая'][week-1] + ' учебная неделя')
     send_message(message.from_user.id,KRASIVIY_VIVOD_id_Vasya,message)
     rand_quote(message)
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.message:
+        msgtxt=call.data[1:]
+        vektor=call.data[0]
+        if vektor=='':'⤵'
+        else:
+            k = call.message.chat
+            week=(msgtxt[msgtxt.find('(')+1:-1])
+            weekNum=-1
+            for I in week:
+                if I=='I': weekNum=weekNum+1
+                else: weekNum=42
+            if weekNum in range(0,2):
+                daynum=weekdays.index(msgtxt[:msgtxt.find('(')])
+                if vektor=='⬅':
+                    daynum=daynum-1
+                    if daynum==-1:
+                        daynum=5
+                        weekNum=1-weekNum
+                elif vektor=='➡':
+                    daynum=daynum+1
+                    if daynum==6:
+                        daynum=0
+                        weekNum=1-weekNum
+                answer = f.onDay(weekdays[daynum], f.id2group(call.message.from_user.id),week=weekNum+1)
+                #print((weekdays[daynum], f.id2group(call.message.chat.id),weekNum+1))
+
+
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=answer,reply_markup=getinlineOnDay(weekdays[daynum]+'('+'I'*(weekNum+1)+')'))
+
 @bot.message_handler(commands=['db'])
 def handle_db(message):
     if message.from_user.id in getadmins(): bot.send_document(message.from_user.id,open('tt.db','rb'))
@@ -162,12 +204,13 @@ def onDay(message): #рассписание
             if I=='I': weekNum=weekNum+1
             else: weekNum=42
         if weekNum in range(0,2):
+            #print(msgtxt[:msgtxt.find('(')], f.id2group(message.from_user.id),weekNum+1)
             answer = f.onDay(msgtxt[:msgtxt.find('(')], f.id2group(message.from_user.id),week=weekNum+1)
         else: ttOnDay(message)
         if answer == "":
             rand_quote(message)
         else:
-            send_message(message.from_user.id, answer,message , reply_markup = standart_buttons_markup(),parse='MARKDOWN')
+            send_message(message.from_user.id, answer, message , reply_markup = getinlineOnDay(msgtxt),parse='MARKDOWN')
             if answer in config.not_lesson:
                 rand_quote(message)
     #elif message.text == "Следующий урок": #это тут не нужно
